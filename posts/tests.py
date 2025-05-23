@@ -13,16 +13,13 @@ class PostTests(TestCase):
             email="poster@example.com",
             password="testpass",
             first_name="Poster",
-            last_name="User"
+            last_name="User",
         )
         self.client.force_authenticate(user=self.user)
         self.post_url = reverse("posts:post-list")
 
     def test_create_post(self):
-        data = {
-            "content": "This is a test post",
-            "hashtags": "#test"
-        }
+        data = {"content": "This is a test post", "hashtags": "#test"}
         response = self.client.post(self.post_url, data)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -39,17 +36,25 @@ class PostTests(TestCase):
         response = self.client.get(self.post_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(any("Visible post" in p["content"] for p in response.data))
+        self.assertTrue(
+            any(
+                "Visible post" in p["content"] for p in response.data
+            )
+        )
 
     def test_followed_users_posts_are_visible(self):
-        other_user = User.objects.create_user(email="followed@example.com", password="test123")
+        other_user = User.objects.create_user(
+            email="followed@example.com", password="test123"
+        )
         Post.objects.create(author=other_user, content="Post from followed")
 
         self.user.following_set.create(following=other_user)
 
         response = self.client.get(self.post_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(any("Post from followed" in p["content"] for p in response.data))
+        self.assertTrue(
+            any("Post from followed" in p["content"] for p in response.data)
+        )
 
     def test_unauthenticated_user_cannot_create_post(self):
         self.client.logout()

@@ -9,7 +9,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from user.models import Follow
 from user.serializers import (
     UserCreateSerializer,
-    UserReadSerializer, FollowingListSerializer, FollowersListSerializer,
+    UserReadSerializer,
+    FollowingListSerializer,
+    FollowersListSerializer,
 )
 from drf_spectacular.utils import extend_schema
 from user.schema_descriptions import (
@@ -36,6 +38,7 @@ class UserListView(generics.ListAPIView):
     filter_backends = [SearchFilter]
     search_fields = ["email", "first_name", "last_name"]
 
+
 @extend_schema(**logout_schema)
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -55,24 +58,36 @@ class FollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
-        return Response({
-            "message": f"This endpoint is for following and unfollowing user {pk}."
-                       f" Send a POST request to follow."
-                       f" Send a DELETE request to unfollow."
-        })
+        return Response(
+            {
+                "message": f"This endpoint is for following "
+                f"and unfollowing user {pk}."
+                f" Send a POST request to follow."
+                f" Send a DELETE request to unfollow."
+            }
+        )
 
     def post(self, request, pk):
         follow_user = User.objects.get(pk=pk)
         current_user = request.user
 
         if follow_user == current_user:
-            return Response({"detail": "You cannot follow yourself."}, status=400)
+            return Response(
+                {"detail": "You cannot follow yourself."},
+                status=400
+            )
 
-        if Follow.objects.filter(follower=current_user, following=follow_user).exists():
+        if Follow.objects.filter(
+                follower=current_user,
+                following=follow_user
+        ).exists():
             return Response({"detail": "Already following."}, status=400)
 
         Follow.objects.create(follower=current_user, following=follow_user)
-        return Response({"detail": f"You are now following user {follow_user.id}."}, status=201)
+        return Response(
+            {"detail": f"You are now following user {follow_user.id}."},
+            status=201
+        )
 
     def delete(self, request, pk):
         try:
@@ -80,11 +95,17 @@ class FollowUserView(APIView):
         except get_user_model().DoesNotExist:
             return Response({"detail": "User not found."}, status=404)
 
-        follow = Follow.objects.filter(follower=request.user, following=follow_user)
+        follow = Follow.objects.filter(
+            follower=request.user,
+            following=follow_user
+        )
         if follow.exists():
             follow.delete()
             return Response({"detail": "Unfollowed successfully."}, status=204)
-        return Response({"detail": "You are not following this user."}, status=400)
+        return Response(
+            {"detail": "You are not following this user."},
+            status=400
+        )
 
 
 @extend_schema(**following_list_schema)
@@ -93,7 +114,9 @@ class FollowingListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Follow.objects.select_related("following").filter(follower=self.request.user)
+        return Follow.objects.select_related("following").filter(
+            follower=self.request.user
+        )
 
 
 @extend_schema(**followers_list_schema)
@@ -102,4 +125,6 @@ class FollowersListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Follow.objects.select_related("follower").filter(following=self.request.user)
+        return Follow.objects.select_related("follower").filter(
+            following=self.request.user
+        )

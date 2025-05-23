@@ -10,8 +10,15 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            "id", "email", "first_name", "last_name",
-            "bio", "location", "image", "created_at", "updated_at"
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "location",
+            "image",
+            "created_at",
+            "updated_at",
         )
 
 
@@ -23,8 +30,15 @@ class FullProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = (
-            "id", "email", "first_name", "last_name",
-            "bio", "location", "image", "created_at", "updated_at"
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "location",
+            "image",
+            "created_at",
+            "updated_at",
         )
         read_only_fields = ("id", "email", "created_at", "updated_at")
 

@@ -14,7 +14,7 @@ class PostListSerializer(serializers.ModelSerializer):
         return {
             "id": obj.author.id,
             "email": obj.author.email,
-            "first_name": obj.author.first_name
+            "first_name": obj.author.first_name,
         }
 
 

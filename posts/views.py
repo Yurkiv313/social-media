@@ -8,7 +8,11 @@ from posts.serializers import PostListSerializer, PostRetrieveSerializer
 from user.models import Follow
 
 from drf_spectacular.utils import extend_schema
-from posts.schema_descriptions import post_list_schema, post_create_schema, post_detail_schema
+from posts.schema_descriptions import (
+    post_list_schema,
+    post_create_schema,
+    post_detail_schema,
+)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -18,7 +22,9 @@ class PostViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         following_users = Follow.objects.filter(
             follower=self.request.user
-        ).values_list("following", flat=True)
+        ).values_list(
+            "following", flat=True
+        )
 
         queryset = Post.objects.filter(
             Q(author=self.request.user) | Q(author__in=following_users)
@@ -61,6 +67,3 @@ class PostViewSet(viewsets.ModelViewSet):
     @extend_schema(**post_detail_schema)
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
-
-
-

@@ -5,7 +5,11 @@ from accounts.helpers import profile_image_path
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=255, blank=True)
     image = models.ImageField(null=True, upload_to=profile_image_path)

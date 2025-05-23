@@ -7,7 +7,10 @@ from accounts.permissions import IsOwnerProfile
 from accounts.serializers import PublicProfileSerializer, FullProfileSerializer
 
 from drf_spectacular.utils import extend_schema
-from accounts.schema_descriptions import own_profile_schema, public_profile_schema
+from accounts.schema_descriptions import (
+    own_profile_schema,
+    public_profile_schema
+)
 
 
 @extend_schema(**own_profile_schema)

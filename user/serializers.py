@@ -41,8 +41,12 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class FollowingListSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(source="following.email", read_only=True)
-    first_name = serializers.CharField(source="following.first_name", read_only=True)
+    email = serializers.CharField(
+        source="following.email", read_only=True
+    )
+    first_name = serializers.CharField(
+        source="following.first_name", read_only=True
+    )
 
     class Meta:
         model = Follow
@@ -51,8 +55,12 @@ class FollowingListSerializer(serializers.ModelSerializer):
 
 
 class FollowersListSerializer(serializers.ModelSerializer):
-    email = serializers.CharField(source="follower.email", read_only=True)
-    first_name = serializers.CharField(source="follower.first_name", read_only=True)
+    email = serializers.CharField(
+        source="follower.email", read_only=True
+    )
+    first_name = serializers.CharField(
+        source="follower.first_name", read_only=True
+    )
 
     class Meta:
         model = Follow
