@@ -11,21 +11,32 @@ from user.serializers import (
     UserCreateSerializer,
     UserReadSerializer, FollowingListSerializer, FollowersListSerializer,
 )
+from drf_spectacular.utils import extend_schema
+from user.schema_descriptions import (
+    register_schema,
+    logout_schema,
+    user_list_schema,
+    follow_schema,
+    following_list_schema,
+    followers_list_schema,
+)
 
 User = get_user_model()
 
 
+@extend_schema(**register_schema)
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
 
 
+@extend_schema(**user_list_schema)
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserReadSerializer
     filter_backends = [SearchFilter]
     search_fields = ["email", "first_name", "last_name"]
 
-
+@extend_schema(**logout_schema)
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -39,6 +50,7 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(**follow_schema)
 class FollowUserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -75,6 +87,7 @@ class FollowUserView(APIView):
         return Response({"detail": "You are not following this user."}, status=400)
 
 
+@extend_schema(**following_list_schema)
 class FollowingListView(generics.ListAPIView):
     serializer_class = FollowingListSerializer
     permission_classes = [IsAuthenticated]
@@ -83,10 +96,10 @@ class FollowingListView(generics.ListAPIView):
         return Follow.objects.select_related("following").filter(follower=self.request.user)
 
 
+@extend_schema(**followers_list_schema)
 class FollowersListView(generics.ListAPIView):
     serializer_class = FollowersListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Follow.objects.select_related("follower").filter(following=self.request.user)
-
