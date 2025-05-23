@@ -1,12 +1,14 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from user.serializers import (
     UserCreateSerializer,
     UserReadSerializer,
-    UserUpdateSerializer,
 )
 
 User = get_user_model()
@@ -16,18 +18,6 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
 
 
-class ManageUserView(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self):
-        return self.request.user
-
-    def get_serializer_class(self):
-        if self.request.method == "GET":
-            return UserReadSerializer
-        return UserUpdateSerializer
-
-
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserReadSerializer
@@ -35,6 +25,14 @@ class UserListView(generics.ListAPIView):
     search_fields = ["email", "first_name", "last_name"]
 
 
-class UserDetailView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserReadSerializer
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
