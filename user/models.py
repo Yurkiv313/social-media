@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import (
     AbstractUser,
     UserManager as DjangoUserManager
@@ -48,3 +49,25 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
     objects = UserManager()
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="following_set"
+    )
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="followers_set"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["follower", "following"],
+                name="unique_follower_following",
+            )
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.follower.email} follows {self.following.email}"
