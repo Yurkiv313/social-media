@@ -16,7 +16,6 @@ from posts.schema_descriptions import (
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.select_related("author")
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
 
     def get_queryset(self):

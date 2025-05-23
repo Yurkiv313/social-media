@@ -4,5 +4,5 @@ from posts.views import PostViewSet
 app_name = "posts"
 
 router = routers.DefaultRouter()
-router.register("posts", PostViewSet)
+router.register("posts", PostViewSet, basename="post")
 urlpatterns = router.urls
