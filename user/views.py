@@ -44,13 +44,13 @@ class FollowUserView(APIView):
 
     def get(self, request, pk):
         return Response({
-            "message": f"This endpoint is for following and unfollowing user {pk}.\n"
-                       f" Send a POST request to follow.\n"
+            "message": f"This endpoint is for following and unfollowing user {pk}."
+                       f" Send a POST request to follow."
                        f" Send a DELETE request to unfollow."
         })
 
     def post(self, request, pk):
-        follow_user = get_user_model().objects.get(pk=pk)
+        follow_user = User.objects.get(pk=pk)
         current_user = request.user
 
         if follow_user == current_user:
@@ -64,7 +64,7 @@ class FollowUserView(APIView):
 
     def delete(self, request, pk):
         try:
-            follow_user = get_user_model().objects.get(pk=pk)
+            follow_user = User.objects.get(pk=pk)
         except get_user_model().DoesNotExist:
             return Response({"detail": "User not found."}, status=404)
 
@@ -77,13 +77,16 @@ class FollowUserView(APIView):
 
 class FollowingListView(generics.ListAPIView):
     serializer_class = FollowingListSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Follow.objects.filter(follower=self.request.user)
+        return Follow.objects.select_related("following").filter(follower=self.request.user)
 
 
 class FollowersListView(generics.ListAPIView):
     serializer_class = FollowersListSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Follow.objects.filter(following=self.request.user)
+        return Follow.objects.select_related("follower").filter(following=self.request.user)
+
